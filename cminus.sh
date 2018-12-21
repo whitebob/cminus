@@ -14,19 +14,19 @@ c-_pushd() {
 
 c-_completion() {
         COMPREPLY=()
-        local cur pre
+        local cur pre path match
         cur="${COMP_WORDS[COMP_CWORD]}"
         pre="${COMP_WORDS[COMP_CWORD-1]}"
         case ${pre} in
                 "-s"|"-l"|"--save"|"--load" ) COMPREPLY=( $( compgen -f -- ${cur} ));; # use file complete for save/load
-                "-f"|"--fuzzy" ) [ -z ${cur} ] || COMPREPLY=( $( compgen -W "$( echo ${DIRSTACK[@]} | xargs -n1 | tail -n +2 | egrep ${cur} | xargs)" -- ) ) && 
+                "-f"|"--fuzzy" ) [ -z ${cur} ] || eval COMPREPLY=( $( compgen -W "$( for path in "${DIRSTACK[@]}"; do echo \'${path}\'; done | tail -n +2 |sort | uniq | egrep ${cur} | while read match; do echo -n "$match "; done )" -- | sed -e "s:^:':g" -e "s:$:':g" ) ) && 
                         if (( ${#COMPREPLY[@]} >= 2 )); then # show the candidates
                                 echo
-                                echo ${COMPREPLY[@]} | xargs -n1 | column -c ${COLUMNS}
+                                for match in  "${COMPREPLY[@]}"; do echo ${match}; done | column -c ${COLUMNS}
                                 echo -n ${COMP_WORDS[@]}
                         fi 
                 ;; # fuzzy match complete
-                * ) COMPREPLY=( $( compgen -W "$( echo ${DIRSTACK[@]} | xargs -n1| tail -n +2 | xargs)" --  ${cur} ) );; # traditional complete style
+                * ) eval COMPREPLY=( $( compgen -W "$( for path in "${DIRSTACK[@]}"; do echo \'${path}\'; done | tail -n +2 |sort | uniq )" --  ${cur} | sed -e "s:^:':g" -e "s:$:':g" ) );; # traditional complete style
         esac
         return 0;
 }
@@ -35,10 +35,10 @@ c-() {
         local path
         case $1 in 
                 "-f"|"--fuzzy" ) shift;; 
-                "-s"|"--save" ) echo ${DIRSTACK[@]} | xargs -n1 | tail -n +2 > $2; return $?;; 
-                "-l"|"--load" ) while read path; do pushd -n ${path}; done < $2; return $?;; 
+                "-s"|"--save" ) for path in "${DIRSTACK[@]}"; do echo ${path}; done | tail -n +2 > $2; return $?;; 
+                "-l"|"--load" ) while read path; do pushd -n "${path}"; done < $2 >/dev/null; return $?;; 
         esac
-        cd $*
+        cd "$*" # quote is necessary when spaces in path
         return $?
 }
 
