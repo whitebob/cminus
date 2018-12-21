@@ -1,11 +1,11 @@
 type c- &> /dev/null || PROMPT_COMMAND="$PROMPT_COMMAND"$';c-_pushd'
 
 c-_pushd() {
-        local pushpwd
+        local path pushpwd
         pushpwd=${OLDPWD}
         eval "  
                 case $( md5 -q -s "`pwd`") in 
-                        ' ' $( dirs -l | tail -n +2 | cut -d\  -f 4- | sed -e 's:^:":g'  -e 's:$:":g' | xargs -n1 md5 -q -s | sed -e 's:^: | :g' | xargs ) ) ;; 
+                        ' ' $( dirs -l | tail -n +2 | cut -d\/ -f 2- | sed -e 's:^:"/:g'  -e 's:$:":g' | xargs -n1 md5 -q -s | sed -e 's:^: | :g' | xargs ) ) ;; 
                         * ) pushd . > /dev/null;; 
                 esac
         ";
