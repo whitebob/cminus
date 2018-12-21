@@ -63,7 +63,7 @@ we have something better! input this:
 ```bash
 c- -f lo
 ```
-now hit the `<key>tab</key>`, you will see "/var/log" shown in your line.
+now hit the `tab`, you will see "/var/log" shown in your line.
 
 "-f" means fuzzy, and if you want to use `c- --fuzzy` it is also OK.
 
@@ -76,6 +76,6 @@ life should be easy, isn't it?
 if you look into the code of CMinus, you will know why I want this:
 
 1.  pure bash  and almost no install depenency . (binutils such as md5 and sed are installed by default in most cases), no contamination.  
-2. less than 30 lines of codes 
+2. less than 50 lines of codes 
 3. smart auto pushd compatible with space seperated dirname such as m\ n
-4. fuzzy searching without using fzf ctrlp or anything need to install 
+4. fuzzy searching without using fzf, ctrlp or anything need to install 
