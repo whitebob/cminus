@@ -18,15 +18,15 @@ c-_completion() {
         cur="${COMP_WORDS[COMP_CWORD]}"
         pre="${COMP_WORDS[COMP_CWORD-1]}"
         case ${pre} in
-                "-s"|"-l"|"--save"|"--load" ) COMPREPLY=( $( compgen -f -- ${cur} ));; # use file complete for save/load
-                "-f"|"--fuzzy" ) [ -z ${cur} ] || eval COMPREPLY=( $( compgen -W "$( for path in "${DIRSTACK[@]}"; do echo \'${path}\'; done | tail -n +2 |sort | uniq | egrep ${cur} | while read match; do echo -n "$match "; done )" -- | sed -e "s:^:':g" -e "s:$:':g" ) ) && 
+                "-s"|"-l"|"--save"|"--load" ) COMPREPLY=( $( compgen -f -- ${cur} ) );; # use file complete for save/load
+                "-f"|"--fuzzy" ) [ -z ${cur} ] || eval COMPREPLY=( $( compgen -W "$( for path in "${DIRSTACK[@]}"; do echo ${path}; done | tail -n +2 | sort | uniq | egrep ${cur} | sed -e "s:^:':g" -e s":$:':g" | while read match; do echo -n "$match "; done )" -- | sed -e "s:^:':g" -e "s:$:':g" ) ) && 
                         if (( ${#COMPREPLY[@]} >= 2 )); then # show the candidates
                                 echo
                                 for match in  "${COMPREPLY[@]}"; do echo ${match}; done | column -c ${COLUMNS}
                                 echo -n ${COMP_WORDS[@]}
                         fi 
                 ;; # fuzzy match complete
-                * ) eval COMPREPLY=( $( compgen -W "$( for path in "${DIRSTACK[@]}"; do echo \'${path}\'; done | tail -n +2 |sort | uniq )" --  ${cur} | sed -e "s:^:':g" -e "s:$:':g" ) );; # traditional complete style
+                * ) eval COMPREPLY=( $( compgen -W "$( for path in "${DIRSTACK[@]}"; do echo \'${path}\'; done | tail -n +2 | sort | uniq )" --  ${cur} | sed -e "s:^:':g" -e "s:$:':g" ) );; # traditional complete style
         esac
         return 0;
 }
