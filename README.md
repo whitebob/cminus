@@ -67,15 +67,30 @@ now hit the `tab`, you will see "/var/log" shown in your line.
 
 "-f" means fuzzy, and if you want to use `c- --fuzzy` it is also OK.
 
-now things become insteresting, you can go a specific visited dir even you only remember part of its path.
+Now things become insteresting, you can go a specific visited dir even you only remember part of its path.
 
-life should be easy, isn't it?
+
+Want more? the fuzzy match support regular expression...Hmm... Try this!
+```bash
+c- -f r$
+```
+now hit the `tab`, "/var" is the only match for your choice.
+
+Of cause you could use the .* or ? in the fuzzy search just as what you would do using grep,
+because that's exactly the command the script running behind. :p 
+
+Oh, I have to mention cminus could deal with spaces in path, which makes one simple idea take more lines to
+complete, but it worths...
+
+Try more and I wish you feel better because it is just so natural as things should have be.     
+
+Life should be easy, isn't it?
 
 #### Why do we need CMinus since we have autojump, z, asdf and so on ?
 
 if you look into the code of CMinus, you will know why I want this:
 
-1.  pure bash  and almost no install depenency . (binutils such as md5 and sed are installed by default in most cases), no contamination.  
+1. pure bash  and almost no install depenency . (binutils and tools such as md5 and sed are installed by default in most cases), no contamination.  
 2. less than 50 lines of codes 
 3. smart auto pushd compatible with space seperated dirname such as m\ n
 4. fuzzy searching without using fzf, ctrlp or anything need to install 
