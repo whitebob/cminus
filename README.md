@@ -110,7 +110,7 @@ let's go together to see how to make it. Wellcome to hack the code and diss me i
 
 Afterall, life should be easy, isn't it?
 
-#### Why do we need CMinus since we have autojump, z, asdf and so on ?
+#### Why do we need CMinus since we have autojump, z, fasd and so on ?
 
 if you look into the code of CMinus, you will know why I want this:
 
@@ -118,5 +118,5 @@ if you look into the code of CMinus, you will know why I want this:
 2. less than 50 lines of codes 
 3. smart auto pushd compatible with space seperated dirname such as m\ n
 4. fuzzy searching without using fzf, ctrlp or anything need to install 
-5. cminus is not going to be the replacement of cd, autojump, j, z or asdf, because its function is quite limited, only to help you change to dirs you
+5. cminus is not going to be the replacement of cd, autojump, j, z or fasd, because its function is quite limited, only to help you change to dirs you
    have travelled or loaded from saved paths.
