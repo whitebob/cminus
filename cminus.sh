@@ -18,7 +18,6 @@ c-_completion() {
         cur="${COMP_WORDS[COMP_CWORD]}"
         pre="${COMP_WORDS[COMP_CWORD-1]}"
         case ${pre} in
-                "-s"|"-l"|"--save"|"--load" ) COMPREPLY=( $( compgen -f -- ${cur} ) );; # use file complete for save/load
                 "-f"|"--fuzzy" ) [ -z ${cur} ] || eval COMPREPLY=( $( compgen -W "$( for path in "${DIRSTACK[@]}"; do echo ${path}; done | tail -n +2 | sort | uniq | egrep ${cur} | sed -e "s:^:':g" -e s":$:':g" | while read match; do echo -n "$match "; done )" -- | sed -e "s:^:':g" -e "s:$:':g" ) ) && 
                         if (( ${#COMPREPLY[@]} >= 2 )); then # show the candidates
                                 echo
@@ -26,17 +25,20 @@ c-_completion() {
                                 echo -n ${COMP_WORDS[@]}
                         fi 
                 ;; # fuzzy match complete
+                "-s"|"-l"|"--save"|"--load" ) COMPREPLY=( $( compgen -f -- ${cur} ) );; # use file complete for save/load
+                "-r"|"--refresh" ) ;; # refresh to remove duplicate items due to load or manual pushd operations
                 * ) eval COMPREPLY=( $( compgen -W "$( for path in "${DIRSTACK[@]}"; do echo \'${path}\'; done | tail -n +2 | sort | uniq )" --  ${cur} | sed -e "s:^:':g" -e "s:$:':g" ) );; # traditional complete style
         esac
         return 0;
 }
 
 c-() {
-        local path
+        local path unistack
         case $1 in 
                 "-f"|"--fuzzy" ) shift;; 
                 "-s"|"--save" ) for path in "${DIRSTACK[@]}"; do echo ${path}; done | tail -n +2 > $2; return $?;; 
                 "-l"|"--load" ) while read path; do pushd -n "${path}"; done < $2 >/dev/null; return $?;; 
+                "-r"|"--refresh" ) unistack=(); eval unistack=( $( for path in "${DIRSTACK[@]}"; do echo \'${path}\'; done | tail -n +2 | sort | uniq ) ); dirs -c; for path in "${unistack[@]}"; do pushd -n "${path}"; done > /dev/null; return $?;; 
         esac
         cd "$*" # quote is necessary when spaces in path
         return $?

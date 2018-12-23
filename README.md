@@ -84,13 +84,39 @@ complete, but it worths...
 
 Try more and I wish you feel better because it is just so natural as things should have be.     
 
-Life should be easy, isn't it?
+You may save the visited file paths by
+```bash
+c- -s ./workspace.txt
+```
+and load them later by 
+```bash
+c- -l ./workspace.txt
+```
+The format is plain pathes, one path per line. 
+Just the same as `find` output, please help yourself to generate and load if you want.:p
+
+It is quite likely after the loading, you have some duplicated entries in your DIRSTACK. you may check them by 
+```bash
+dirs -l
+```
+Here `dirs` is a built-in command in bash (by the way, `dirs -c` will clean the tracks). Don't worry, you can refresh 
+```bash
+c- -r
+```
+to make the stack items unique and sorted, saving some memory (Maybe...) :p
+
+OK, that's almost all of the cminus. If you feel anything not comfortable or anything needs to improve, 
+let's go together to see how to make it. Wellcome to hack the code and diss me if you have better solutions.    
+
+Afterall, life should be easy, isn't it?
 
 #### Why do we need CMinus since we have autojump, z, asdf and so on ?
 
 if you look into the code of CMinus, you will know why I want this:
 
-1. pure bash  and almost no install depenency . (binutils and tools such as md5 and sed are installed by default in most cases), no contamination.  
+1. pure bash and almost no install depenency . (binutils and tools such as md5 and sed are installed by default in most cases), no contamination.  
 2. less than 50 lines of codes 
 3. smart auto pushd compatible with space seperated dirname such as m\ n
 4. fuzzy searching without using fzf, ctrlp or anything need to install 
+5. cminus is not going to be the replacement of cd, autojump, j, z or asdf, because its function is quite limited, only to help you change to dirs you
+   have travelled or loaded from saved paths.
