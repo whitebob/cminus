@@ -32,12 +32,12 @@ c-_completion() {
         case ${pre} in
                 "-f"|"--fuzzy" ) [ -z ${cur} ] || eval COMPREPLY=( $( compgen -W "$( for path in "${DIRSTACK[@]}"; do echo ${path}; done | tail -n +2 | sort | uniq | egrep ${cur} | sed -e "s:^:':g" -e s":$:':g" | while read match; do echo -n "$match "; done )" -- | sed -e "s:^:':g" -e "s:$:':g" ) ) && 
                         if (( ${#COMPREPLY[@]} >= 2 )); then # show the candidates
-                                echo; for match in  "${COMPREPLY[@]}"; do echo ${match}; done |egrep --color=always ${cur} | column -c ${COLUMNS}; echo -n ${COMP_WORDS[@]};
+                                echo; for match in  "${COMPREPLY[@]}"; do echo ${match}; done |egrep --color=always ${cur} | column -c ${COLUMNS};echo -e "\033[01;32m${#COMPREPLY[@]}\033[00m records matched."; echo -n ${COMP_WORDS[@]};
                         fi 
                 ;; # fuzzy match complete
                 "-s"|"-l"|"--save"|"--load" ) COMPREPLY=( $( compgen -f -- ${cur} ) );; # use file complete for save/load
                 "-r"|"--refresh" ) ;; # refresh to remove duplicate items due to load or manual pushd operations
-                * ) eval COMPREPLY=( $( compgen -W "$( for path in "${DIRSTACK[@]}"; do echo \'${path}\'; done | tail -n +2 | sort | uniq )" --  ${cur} | sed -e "s:^:':g" -e "s:$:':g" ) );; # traditional complete style
+        * ) eval COMPREPLY=( $( compgen -W "$( for path in "${DIRSTACK[@]}"; do echo \'${path}\'; done | tail -n +2 | sort | uniq )" --  ${cur} | sed -e "s:^:':g" -e "s:$:':g" ) ); (( ${#COMPREPLY[@]} > 1 )) && echo -e "\n\033[01;32m${#COMPREPLY[@]}\033[00m records matched." && echo -n ${COMP_WORDS[@]};; # traditional complete style
         esac
         return 0;
 }
