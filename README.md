@@ -93,7 +93,11 @@ and load them later by
 c- -l ./workspace.txt
 ```
 The format is plain pathes, one path per line. 
-Just the same as `find` output, please help yourself to generate and load if you want.:p
+Just the same as `find` output, please help yourself to generate and load if you want,
+or you can try this for free :p (DON'T TRY THIS UNDER A HEAVY DIR!!!)  
+```bash
+c- -l <(find `pwd` -type d)
+``` 
 
 It is quite likely after the loading, you have some duplicated entries in your DIRSTACK. you may check them by 
 ```bash
