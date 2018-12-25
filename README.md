@@ -4,7 +4,10 @@
 #### Usage:
 c- is quite simple and intuitive, aiming minmal code to ehance your path-changing efficency.
 
-git clone ...
+You can watch the movie to see how it is like.
+![Movie](https://youtu.be/b8Bem53Cz9A)
+
+git clone https://github.com/whitebob/cminus
 
 put cminus.sh into where your bash could auto source it. 
 
