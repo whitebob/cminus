@@ -5,8 +5,8 @@
 c- is quite simple and intuitive, aiming minmal code to ehance your path-changing efficency.
 
 You can watch the movie to see how it is like.
-![Movie](https://youtu.be/b8Bem53Cz9A)
-
+[![Movie]()](https://youtu.be/b8Bem53Cz9A)
+[!image](https://github.com/whitebob/cminus/Cminus.gif)
 git clone https://github.com/whitebob/cminus
 
 put cminus.sh into where your bash could auto source it. 
