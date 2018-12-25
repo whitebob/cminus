@@ -5,7 +5,10 @@
 c- is quite simple and intuitive, aiming minmal code to ehance your path-changing efficency.
 
 You can watch the movie to see how it is like.
-![Movie](https://youtu.be/b8Bem53Cz9A)
+
+![image](https://github.com/whitebob/cminus/blob/master/Cminus.gif?raw=true)
+
+You can also check the movie on https://youtu.be/b8Bem53Cz9A
 
 git clone https://github.com/whitebob/cminus
 
