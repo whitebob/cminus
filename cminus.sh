@@ -21,7 +21,7 @@ CMINUSMD5PROG="$( [ ! -z `command -v md5` ] && echo -n 'md5 -q -s' ) $( [ ! -z `
 c-_pushd() {
         local pushpwd hashhead
         pushpwd=${OLDPWD}
-        hashhead="$( ${CMINUSMD5PROG} "`pwd`" | cut -c-7 )" 
+        hashhead="$( eval ${CMINUSMD5PROG} \"`pwd`\" | cut -c-7 )" 
         [ -z $( pwd | egrep ${CMINUSIGNORE} )] && eval " case ${hashhead} in ${CMINUSHASH} ) ;; * ) CMINUSHASH+='|'${hashhead}; pushd . > /dev/null ;; esac ";
         OLDPWD=${pushpwd} # recover OLDPWD to make "cd -" work as before. 
 }
