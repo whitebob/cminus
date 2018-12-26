@@ -14,13 +14,14 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-type c- &> /dev/null || PROMPT_COMMAND="$PROMPT_COMMAND"$';c-_pushd'
+type c- &> /dev/null || PROMPT_COMMAND="${PROMPT_COMMAND:-:}"$';c-_pushd'
 CMINUSHASH="' '"
 CMINUSIGNORE=".git|node_modules"
+CMINUSMD5PROG="$( [ ! -z `command -v md5` ] && echo -n 'md5 -q -s' ) $( [ ! -z `command -v md5sum` ] && echo -n '> >(md5sum) echo -n' )"
 c-_pushd() {
-        local path pushpwd hashhead
+        local pushpwd hashhead
         pushpwd=${OLDPWD}
-        hashhead="$( md5 -q -s "`pwd`" | cut -c-7 )"
+        hashhead="$( ${CMINUSMD5PROG} "`pwd`" | cut -c-7 )" 
         [ -z $( pwd | egrep ${CMINUSIGNORE} )] && eval " case ${hashhead} in ${CMINUSHASH} ) ;; * ) CMINUSHASH+='|'${hashhead}; pushd . > /dev/null ;; esac ";
         OLDPWD=${pushpwd} # recover OLDPWD to make "cd -" work as before. 
 }
@@ -47,8 +48,8 @@ c-() {
         case $1 in 
                 "-f"|"--fuzzy" ) shift;; 
                 "-s"|"--save" ) for path in "${DIRSTACK[@]}"; do echo ${path}; done | tail -n +2 > $2; return $?;; 
-                "-l"|"--load" ) while read path; do [ -z $( echo ${path} | egrep ${CMINUSIGNORE} ) ] && pushd -n "${path}"; done < $2 >/dev/null; CMINUSHASH="' '$( dirs -l | tail -n +2 | cut -d\/ -f 2- | sed -e 's:^:"/:g'  -e 's:$:":g' | xargs -n1 md5 -q -s | cut -c-7 | sed -e 's:^:|:g' | sort | uniq | xargs -n1 echo -n )"; return $?;; 
-                "-r"|"--refresh" ) unistack=(); eval unistack=( $( for path in "${DIRSTACK[@]}"; do echo \'${path}\'; done | tail -n +2 | sort | uniq ) ); dirs -c; for path in "${unistack[@]}"; do pushd -n "${path}"; done > /dev/null; CMINUSHASH="' '$( dirs -l | tail -n +2 | cut -d\/ -f 2- | sed -e 's:^:"/:g'  -e 's:$:":g' | xargs -n1 md5 -q -s | cut -c-7 | sed -e 's:^:|:g' | sort | uniq | xargs -n1 echo -n )"; return $?;; 
+                "-l"|"--load" ) while read path; do [ -z $( echo ${path} | egrep ${CMINUSIGNORE} ) ] && pushd -n "${path}"; done < $2 >/dev/null; CMINUSHASH="' '$( dirs -l | tail -n +2 | cut -d\/ -f 2- | sed -e 's:^:"/:g'  -e 's:$:":g' | eval "xargs -n1 ${CMINUSMD5PROG}" | cut -c-7 | sed -e 's:^:|:g' | sort | uniq | xargs -n1 echo -n )"; return $?;; 
+                "-r"|"--refresh" ) unistack=(); eval unistack=( $( for path in "${DIRSTACK[@]}"; do echo \'${path}\'; done | tail -n +2 | sort | uniq ) ); dirs -c; for path in "${unistack[@]}"; do pushd -n "${path}"; done > /dev/null; CMINUSHASH="' '$( dirs -l | tail -n +2 | cut -d\/ -f 2- | sed -e 's:^:"/:g'  -e 's:$:":g' | eval "xargs -n1 ${CMINUSMD5PROG}" | cut -c-7 | sed -e 's:^:|:g' | sort | uniq | xargs -n1 echo -n )"; return $?;; 
         esac
         cd "$*" # quote is necessary when spaces in path
         return $?
