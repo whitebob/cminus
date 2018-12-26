@@ -13,12 +13,14 @@
 #
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
+trap 'echo "Signal received."; return -1' INT KILL
 type c- &> /dev/null || PROMPT_COMMAND="${PROMPT_COMMAND:-:}"$';c-_pushd'
 CMINUSHASH="' '"
 CMINUSIGNORE=".git|node_modules"
-CMINUSMD5PROG="$( [ ! -z `command -v md5` ] && echo -n 'md5 -q -s' ) $( [ ! -z `command -v md5sum` ] && echo -n '> >(md5sum) echo -n' )"
+CMINUSDISABLED=""
+CMINUSMD5PROG="$( ( [ ! -z `command -v md5` ] && echo -n 'md5 -q -s' ) || ( [ ! -z `command -v md5sum` ] && echo -n '> >(md5sum) echo -n' ) || echo -n 'CMINUSDISABLED="True" && echo "No md5 found, Disable cminus"' )"
 c-_pushd() {
+        if [ ! -z ${CMINUSDISABLED} ]; then return 0; fi
         local pushpwd hashhead
         pushpwd=${OLDPWD}
         hashhead="$( eval ${CMINUSMD5PROG} \"`pwd`\" | cut -c-7 )" 
@@ -27,6 +29,7 @@ c-_pushd() {
 }
 c-_completion() {
         COMPREPLY=()
+        if [ ! -z ${CMINUSDISABLED} ]; then return 0; fi
         local cur pre path match
         cur="${COMP_WORDS[COMP_CWORD]}"
         pre="${COMP_WORDS[COMP_CWORD-1]}"
@@ -38,12 +41,12 @@ c-_completion() {
                 ;; # fuzzy match complete
                 "-s"|"-l"|"--save"|"--load" ) COMPREPLY=( $( compgen -f -- ${cur} ) );; # use file complete for save/load
                 "-r"|"--refresh" ) ;; # refresh to remove duplicate items due to load or manual pushd operations
-        * ) eval COMPREPLY=( $( compgen -W "$( for path in "${DIRSTACK[@]}"; do echo \'${path}\'; done | tail -n +2 | sort | uniq )" --  ${cur} | sed -e "s:^:':g" -e "s:$:':g" ) ); (( ${#COMPREPLY[@]} > 1 )) && echo -e "\n\033[01;32m${#COMPREPLY[@]}\033[00m records matched." && echo -n ${COMP_WORDS[@]};; # traditional complete style
+                * ) eval COMPREPLY=( $( compgen -W "$( for path in "${DIRSTACK[@]}"; do echo \'${path}\'; done | tail -n +2 | sort | uniq )" --  ${cur} | sed -e "s:^:':g" -e "s:$:':g" ) ); (( ${#COMPREPLY[@]} > 1 )) && echo -e "\n\033[01;32m${#COMPREPLY[@]}\033[00m records matched." && echo -n ${COMP_WORDS[@]};; # traditional complete style
         esac
         return 0;
 }
 c-() {
-        trap 'echo "Signal received."; return -1' INT KILL
+        if [ ! -z ${CMINUSDISABLED} ]; then return 0; fi
         local path unistack
         case $1 in 
                 "-f"|"--fuzzy" ) shift;; 
