@@ -48,8 +48,8 @@ c-() {
         case $1 in 
                 "-f"|"--fuzzy" ) shift;; 
                 "-s"|"--save" ) for path in "${DIRSTACK[@]}"; do echo ${path}; done | tail -n +2 > $2; return $?;; 
-                "-l"|"--load" ) while read path; do [ -z $( echo ${path} | egrep ${CMINUSIGNORE} ) ] && pushd -n "${path}"; done < $2 >/dev/null; CMINUSHASH="' '$( dirs -l | tail -n +2 | cut -d\/ -f 2- | sed -e 's:^:"/:g'  -e 's:$:":g' | eval "xargs -n1 ${CMINUSMD5PROG}" | cut -c-7 | sed -e 's:^:|:g' | sort | uniq | xargs -n1 echo -n )"; return $?;; 
-                "-r"|"--refresh" ) unistack=(); eval unistack=( $( for path in "${DIRSTACK[@]}"; do echo \'${path}\'; done | tail -n +2 | sort | uniq ) ); dirs -c; for path in "${unistack[@]}"; do pushd -n "${path}"; done > /dev/null; CMINUSHASH="' '$( dirs -l | tail -n +2 | cut -d\/ -f 2- | sed -e 's:^:"/:g'  -e 's:$:":g' | eval "xargs -n1 ${CMINUSMD5PROG}" | cut -c-7 | sed -e 's:^:|:g' | sort | uniq | xargs -n1 echo -n )"; return $?;; 
+                "-l"|"--load" ) while read path; do [ -z $( echo ${path} | egrep ${CMINUSIGNORE} ) ] && pushd -n "${path}"; done < $2 >/dev/null; CMINUSHASH="' '$( for path in "${DIRSTACK[@]}"; do echo "${path}"; done | tail -n +2 | while read path; do eval ${CMINUSMD5PROG} \"${path}\"; done | cut -c-7 | sed -e 's:^:|:g' | sort | uniq | xargs -n1 echo -n )"; return $?;;
+                "-r"|"--refresh" ) unistack=(); eval unistack=( $( for path in "${DIRSTACK[@]}"; do echo \'${path}\'; done | tail -n +2 | sort | uniq ) ); dirs -c; for path in "${unistack[@]}"; do pushd -n "${path}"; done > /dev/null; CMINUSHASH="' '$( for path in "${DIRSTACK[@]}"; do echo "${path}"; done | tail -n +2 |while read path; do eval ${CMINUSMD5PROG} \"${path}\"; done | cut -c-7 | sed -e 's:^:|:g' | sort | uniq | xargs -n1 echo -n )"; return $?;;
         esac
         cd "$*" # quote is necessary when spaces in path
         return $?
