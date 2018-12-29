@@ -16,7 +16,7 @@
 trap 'echo "Signal received."; return -1' INT KILL
 type c- &> /dev/null || PROMPT_COMMAND="${PROMPT_COMMAND:-:}"$';c-_pushd'
 CMINUSHASH="' '"
-CMINUSIGNORE=".git|node_modules"
+CMINUSIGNORE="/\.git$|/\.git/|/node_modules$|/node_modules/"
 CMINUSDISABLED=""
 CMINUSMD5PROG="$( ( [ ! -z `command -v md5` ] && echo -n 'md5 -q -s' ) || ( [ ! -z `command -v md5sum` ] && echo -n '> >(md5sum) echo -n' ) || echo -n 'CMINUSDISABLED="True" && echo "No md5 found, Disable cminus"' )"
 c-_pushd() {
@@ -24,7 +24,7 @@ c-_pushd() {
         local pushpwd hashhead
         pushpwd=${OLDPWD}
         hashhead="$( eval ${CMINUSMD5PROG} \"`pwd`\" | cut -c-7 )" 
-        [ -z $( pwd | egrep ${CMINUSIGNORE} )] && eval " case ${hashhead} in ${CMINUSHASH} ) ;; * ) CMINUSHASH+='|'${hashhead}; pushd . > /dev/null ;; esac ";
+        [ -z $( pwd | egrep ${CMINUSIGNORE} ) ] && eval " case ${hashhead} in ${CMINUSHASH} ) ;; * ) CMINUSHASH+='|'${hashhead}; pushd . > /dev/null ;; esac ";
         OLDPWD=${pushpwd} # recover OLDPWD to make "cd -" work as before. 
 }
 c-_completion() {
