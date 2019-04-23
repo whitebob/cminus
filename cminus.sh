@@ -19,6 +19,7 @@ CMINUSHASH="' '"
 CMINUSIGNORE="/\.git$|/\.git/|/node_modules$|/node_modules/"
 CMINUSDISABLED=""
 CMINUSMD5PROG="$( ( [ ! -z `command -v md5` ] && echo -n 'md5 -q -s' ) || ( [ ! -z `command -v md5sum` ] && echo -n '> >(md5sum) echo -n' ) || echo -n 'CMINUSDISABLED="True" && echo "No md5 found, Disable cminus"' )"
+type OLDCOMPREPLY &> /dev/null || declare -a OLDCOMPREPLY
 c-_pushd() {
         if [ ! -z ${CMINUSDISABLED} ]; then return 0; fi
         local pushpwd hashhead
@@ -30,26 +31,31 @@ c-_pushd() {
 c-_completion() {
         COMPREPLY=()
         if [ ! -z ${CMINUSDISABLED} ]; then return 0; fi
-        local cur pre path match
+        local cur pre path match count
         cur="${COMP_WORDS[COMP_CWORD]}"
         pre="${COMP_WORDS[COMP_CWORD-1]}"
         case ${pre} in
                 "-s"|"-l"|"--save"|"--load" ) COMPREPLY=( $( compgen -f -- ${cur} ) );; # use file complete for save/load
                 "-r"|"--refresh" ) ;; # refresh to remove duplicate items due to load or manual pushd operations
                 "-f"|"--fuzzy" ) eval COMPREPLY=( $( compgen -W "$( for path in "${DIRSTACK[@]}"; do echo ${path}; done | tail -n +2 | sort | uniq | if [ -z ${cur} ]; then cat; else grep -e "${cur}";fi | sed -e "s:^:':g" -e s":$:':g" | while read match; do echo -n "$match "; done )" -- | sed -e "s:^:':g" -e "s:$:':g" ) );; # fuzzy match complete
+                "-i"|"--index" ) if (( ${#OLDCOMPREPLY[@]} > 1 )); then COMPREPLY=( "${OLDCOMPREPLY[cur]}" ); fi ;;
                * ) eval COMPREPLY=( $( compgen -W "$( for path in "${DIRSTACK[@]}"; do echo \'${path}\'; done | tail -n +2 | sort | uniq )" --  ${cur} | sed -e "s:^:':g" -e "s:$:':g" ) );; # traditional complete style
         esac
         if (( ${#COMPREPLY[@]} > 1 )); then # show the candidates
-                echo; for match in  "${COMPREPLY[@]}"; do echo ${match}; done | if [ -z ${cur} ]; then cat; else grep --color=always -e "${cur}"; fi | sort | uniq | column -c ${COLUMNS}; echo -e "\033[01;32m${#COMPREPLY[@]}\033[00m records matched." && echo -n ${COMP_WORDS[@]}
+                echo; count=0; for match in  "${COMPREPLY[@]}"; do echo ${count} ${match}; (( ++count )); done | if [ -z ${cur} ]; then cat; else grep --color=always -e "${cur}"; fi | sort | uniq | column -c ${COLUMNS}; echo -e "\033[01;32m${#COMPREPLY[@]}\033[00m records matched." && echo -n ${COMP_WORDS[@]}
+                OLDCOMPREPLY=( "${COMPREPLY[@]}" ); 
         fi
         return 0;
 }
 c-() {
         if [ ! -z ${CMINUSDISABLED} ]; then return 0; fi
-        local path unistack
+        local path unistack arg pos flag
+        flag=0; pos=1; for arg in $*; do if [ ${arg} == "-i" ]; then flag=1; break; fi; (( pos++ )); done
+        if (( flag == 1 )); then for ((; ${pos} != 1; --pos )); do shift; done; fi
         case $1 in 
                 "-f"|"--fuzzy" ) shift;;
                 "-h"|"--help" ) shift;;
+                "-i"|"--index" ) shift;;
                 "-s"|"--save" ) for path in "${DIRSTACK[@]}"; do echo ${path}; done | tail -n +2 > $2; return $?;;
                 "-l"|"--load" ) while read path; do [ -z $( echo ${path} | egrep ${CMINUSIGNORE} ) ] && pushd -n "${path}"; done < $2 >/dev/null; CMINUSHASH="' '$( for path in "${DIRSTACK[@]}"; do echo "${path}"; done | tail -n +2 | while read path; do eval ${CMINUSMD5PROG} \"${path}\"; done | cut -c-7 | sed -e 's:^:|:g' | sort | uniq | xargs -n1 echo -n )"; return $?;;
                 "-r"|"--refresh" ) unistack=(); eval unistack=( $( for path in "${DIRSTACK[@]}"; do [ -d "${path}" ] && echo \'${path}\'; done | tail -n +2 | sort | uniq ) ); dirs -c; for path in "${unistack[@]}"; do pushd -n "${path}"; done > /dev/null; CMINUSHASH="' '$( for path in "${DIRSTACK[@]}"; do echo "${path}"; done | tail -n +2 |while read path; do eval ${CMINUSMD5PROG} \"${path}\"; done | cut -c-7 | sed -e 's:^:|:g' | sort | uniq | xargs -n1 echo -n )"; return $?;;
