@@ -42,7 +42,7 @@ c-_completion() {
                * ) eval COMPREPLY=( $( compgen -W "$( for path in "${DIRSTACK[@]}"; do echo \'${path}\'; done | tail -n +2 | sort | uniq )" --  ${cur} | sed -e "s:^:':g" -e "s:$:':g" ) );; # traditional complete style
         esac
         if (( ${#COMPREPLY[@]} > 1 )); then # show the candidates
-                echo; count=0; for match in  "${COMPREPLY[@]}"; do echo ${count} ${match}; (( ++count )); done | if [ -z ${cur} ]; then cat; else grep --color=always -e "${cur}"; fi | sort | uniq | column -c ${COLUMNS}; echo -e "\033[01;32m${#COMPREPLY[@]}\033[00m records matched." && echo -n ${COMP_WORDS[@]}
+                echo; count=0; for match in  "${COMPREPLY[@]}"; do echo ${count} ${match}; (( ++count )); done | if [ -z ${cur} ]; then cat; else grep --color=always -e "${cur}"; fi | sort -n | uniq | column -c ${COLUMNS}; echo -e "\033[01;32m${#COMPREPLY[@]}\033[00m records matched." && echo -n ${COMP_WORDS[@]}
                 OLDCOMPREPLY=( "${COMPREPLY[@]}" ); 
         fi
         return 0;
