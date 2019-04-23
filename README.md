@@ -40,7 +40,7 @@ $c- /
 and hit `<tab>` twice:
 ```bash
 $c- /
-/                     /bin                     /sbin                    /usr/bin                 /usr/sbin                /var                     /var/log
+0 /                    1 /bin                    2 /sbin                   3 /usr/bin                4 /usr/sbin               5 /var                    6 /var/log
 ```
 You will see all the tracks traveled previously. 
 
@@ -57,11 +57,21 @@ Now you have two candidates "/usr/sbin" and "/usr/bin", hit`<tab>` twice again, 
 
 ```bash
 $c- /usr/
-/usr/bin   /usr/sbin
+0 /usr/bin   1 /usr/sbin
 ```
 hit `s` and press `<tab>`, now you get what you want.
 
 Simple and intuitive, isn't it? 
+
+Or if you just want to go into the path by its index 
+```bash
+$c- /usr/<tab>
+0 /usr/bin   1 /usr/sbin
+$c- /usr/  -i 1<tab>
+$c- /usr/ -i /usr/sbin <enter>
+```
+when there are more letters for you enter, use index. 
+input `<space>`-i`<space>``<index>`, then hit `<tab>`.
 
 we have something better! input this:
 
@@ -79,7 +89,7 @@ Want more? the fuzzy match support regular expression...Hmm... Try this!
 ```bash
 c- -f r$
 ```
-now hit the `tab`, "/var" is the only match for your choice.
+now hit the `<tab>`, "/var" is the only match for your choice.
 
 Of cause you could use the .* or ? in the fuzzy search just as what you would do using grep,
 because that's exactly the command the script running behind. :p 
